@@ -1,0 +1,9 @@
+[Unit]
+Description=Marcel Mobile
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/marcel-mobile
+
+[Install]
+WantedBy=multi-user.target

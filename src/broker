@@ -1,0 +1,53 @@
+#!/bin/bash
+
+mkfifo /dev/ttyAMA1 2>/dev/null
+
+proxy_out() {
+	mkfifo $1 2>/dev/null
+	chmod a+w $1 2>/dev/null
+	while true; do
+	(
+		while read line; do
+			echo "$2 $line";
+		done
+	) < $1
+	done &
+}
+
+proxy_in() {
+	mkfifo $1 2>/dev/null
+	chmod a+r $1 2>/dev/null
+	chmod o-w $1 2>/dev/null
+	mkdir -p /tmp/.marcel-mobile/proxy_in
+	echo "$1" > /tmp/.marcel-mobile/proxy_in/$2
+	while true; do sleep 999999999; done > $1 &
+}
+
+
+# Read loop from ttyAMA0
+while true; do
+	(
+		while read line; do
+			char=${line::1}
+			cmd=$(echo $line | cut -c3-100000)
+			out=$(cat /tmp/.marcel-mobile/proxy_in/$char)
+			if [ -n "$out" ]; then
+				echo $cmd 2>&1
+				echo $cmd > $out;
+			else
+				echo "Unknown callback : $line" 1>&2;
+			fi
+		done
+	) < /dev/ttyAMA1
+done &
+
+
+# Main
+proxy_out /dev/motors S
+proxy_out /dev/roam T
+proxy_out /dev/zob Z
+proxy_in /dev/us U
+proxy_in /dev/odo O
+
+####
+while true; do read a; done
