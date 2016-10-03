@@ -45,7 +45,6 @@ done &
 # Main
 proxy_out /dev/motors S
 proxy_out /dev/roam T
-proxy_out /dev/zob Z
 proxy_in /dev/us U
 proxy_in /dev/odo O
 
