@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mkfifo /dev/ttyAMA1 2>/dev/null
+#mkfifo /dev/ttyAMA0 2>/dev/null
 
 proxy_out() {
 	mkfifo $1 2>/dev/null
@@ -38,7 +38,7 @@ while true; do
 				echo "Unknown callback : $line" 1>&2;
 			fi
 		done
-	) < /dev/ttyAMA1
+	) < /dev/ttyAMA0
 done &
 
 

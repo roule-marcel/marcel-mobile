@@ -3,4 +3,4 @@
 cd `dirname $0`
 
 TTY=/dev/ttyAMA0
-flock -n $TTY -c ./src/broker
+flock -n $TTY -c ./src/broker > $TTY
