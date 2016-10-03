@@ -1,5 +1,8 @@
 #!/bin/bash
 
+
+stty -F /dev/ttyAMA0 115200 cs8
+
 #mkfifo /dev/ttyAMA0 2>/dev/null
 
 proxy_out() {
@@ -8,7 +11,8 @@ proxy_out() {
 	while true; do
 	(
 		while read line; do
-			echo "$2 $line";
+			echo -e -n "$2 $line\r\n";
+			echo -e -n "$2 $line\r\n" >&2
 		done
 	) < $1
 	done &
@@ -25,28 +29,29 @@ proxy_in() {
 
 
 # Read loop from ttyAMA0
-while true; do
-	(
-		while read line; do
-			char=${line::1}
-			cmd=$(echo $line | cut -c3-100000)
-			out=$(cat /tmp/.marcel-mobile/proxy_in/$char)
-			if [ -n "$out" ]; then
-				echo $cmd 2>&1
-				echo $cmd > $out;
-			else
-				echo "Unknown callback : $line" 1>&2;
-			fi
-		done
-	) < /dev/ttyAMA0
-done &
+# while true; do
+# 	(
+# 		while read line; do
+# 			char=${line::1}
+# 			cmd=$(echo $line | cut -c3-100000)
+# 			out=$(cat /tmp/.marcel-mobile/proxy_in/$char 2>/dev/null)
+# 			if [ -n "$out" ]; then
+# 				echo $cmd 2>&1
+# 				echo $cmd > $out;
+# 			else
+# 				echo "Unknown callback : $line" 1>&2;
+# 			fi
+# 		done
+# 	) < /dev/ttyAMA0
+# done &
 
 
 # Main
-proxy_out /dev/motors S
-proxy_out /dev/roam T
-proxy_in /dev/us U
-proxy_in /dev/odo O
+proxy_out /dev/motors s
+proxy_out /dev/roam t
+#proxy_in /dev/us u
+#proxy_in /dev/odo o
+
 
 ####
-while true; do read a; done
+while true; do sleep 100; done
