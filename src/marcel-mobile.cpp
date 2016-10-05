@@ -77,7 +77,7 @@ void proxy_in(char c, const char* path) {
 }
 
 void read_conf(const char* file) {
-	FILE* fConf = fopen("marcel-mobile.conf", "r");
+	FILE* fConf = fopen(file, "r");
 	if(fConf) {
 		char line[1024];
 		while (fgets(line, 1024, fConf) != NULL)  {

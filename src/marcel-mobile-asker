@@ -2,8 +2,18 @@
 
 # This script makes continous queries to the robot for odometry and US sensors
 
+echo a > tmp/a
+
+while [ ! -p /dev/robot ]; do sleep 1; done
+
+echo zut > tmp/a
+
 echo "o 100" > /dev/robot
+
+echo ok > tmp/a
+
 while true; do
+	echo "prout" > /tmp/a
 	echo "z" > /dev/robot
 	sleep 0.1
 done

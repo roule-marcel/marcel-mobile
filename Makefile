@@ -17,7 +17,7 @@ install:
 	sudo systemctl stop marcel-mobile-asker.service
 	sudo mkdir -p /etc/marcel/
 	sudo cp marcel-mobile /usr/bin
-	sudo cp marcel-mobile-asker /usr/bin
+	sudo cp src/marcel-mobile-asker /usr/bin
 	sudo cp marcel-mobile.conf /etc/marcel/
 	sudo cp marcel-mobile.service /etc/systemd/system/
 	sudo cp marcel-mobile-asker.service /etc/systemd/system/
