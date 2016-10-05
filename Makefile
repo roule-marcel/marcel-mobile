@@ -1,4 +1,15 @@
-all:
+all: marcel-mobile
+
+marcel-mobile: bin/marcel-mobile.o /usr/lib/libpubsub.so
+	g++ -g -pthread -o -std=c++11 -o $@ $< -lpubsub
+
+bin/%.o: src/%.cpp src/serial.h
+	mkdir -p `dirname $@`
+	g++ -g -pthread -std=c++11 -o $@ -c $<
+
+clean:
+	rm -rf bin
+	rm -f marcel-mobile
 
 
 install:
