@@ -11,4 +11,4 @@ marcel-mobile creates several UNIX FIFOs, and mux/demux various corresponding ch
 
 Data is simply issued in text, and fields are space-separated, one record per line
 
-[https://raw.githubusercontent.com/roule-marcel/stuff/master/doc/archi.png](archi)
+![https://raw.githubusercontent.com/roule-marcel/stuff/master/doc/archi.png](archi)
