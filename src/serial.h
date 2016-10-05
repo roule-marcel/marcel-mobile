@@ -21,11 +21,11 @@ void serial_init(const char* tty) {
 	tio.c_iflag=0;
 	tio.c_oflag=0;
 	tio.c_cflag=CS8|CREAD|CLOCAL;           // 8n1, see termios.h for more information
-	tio.c_lflag=0;
+	tio.c_lflag=ICANON;
 	tio.c_cc[VMIN]=1;
 	tio.c_cc[VTIME]=5;
 
-	tty_fd = open(tty, O_RDWR | O_NONBLOCK);
+	tty_fd = open(tty, O_RDWR | O_NOCTTY);
 	cfsetospeed(&tio,B115200);            // 115200 baud
 	cfsetispeed(&tio,B115200);            // 115200 baud
 	tcsetattr(tty_fd,TCSANOW,&tio);

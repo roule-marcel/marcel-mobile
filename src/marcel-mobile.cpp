@@ -31,7 +31,8 @@ public:
 			char line[1024];
 			while (fgets(line, 1024, f) != NULL)  {
 				if(line[strlen(line)-1]=='\n') line[strlen(line)-1] = 0;
-				serial_command("%c %s", c, line);
+				if(c) serial_command("%c %s", c, line);
+				else serial_command("%s", line);
 			}
 		}
 	}
@@ -93,13 +94,16 @@ void read_conf(const char* file) {
 
 void do_proxy(char c, const char* cmd) {
 	ProxyIn* p = PROXIES_IN[c];
-	if(!p)  fprintf(stderr, "Unknown command : %c %s\n", c, cmd);
+	if(!p) { /* fprintf(stderr, "Unknown command : %c %s\n", c, cmd); */ }
 	else p->cmd(cmd);
 }
 
 int main(int argc, char const *argv[]) {
 	serial_init("/dev/ttyAMA0");
-	read_conf("marcel-mobile.conf");
+	read_conf("/etc/marcel/marcel-mobile.conf");
+
+	PROXIES_OUT[0] = new ProxyOut(0, "/dev/robot");
+
 
 	FILE* fTTY = fdopen(tty_fd, "r");
 	if(!fTTY) { fprintf(stderr, "Error : Can't talk to /dev/ttyAMA0\n"); exit(1); }
@@ -111,6 +115,7 @@ int main(int argc, char const *argv[]) {
 			do_proxy(c, line[1] == ' ' ? &line[2] : &line[1]);
 		}
 	}
+
 
 	return 0;
 }

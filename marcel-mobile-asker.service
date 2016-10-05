@@ -1,0 +1,9 @@
+[Unit]
+Description=Marcel Mobile Asker 
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/marcel-mobile-asker
+
+[Install]
+WantedBy=multi-user.target

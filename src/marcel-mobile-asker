@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# This script makes continous queries to the robot for odometry and US sensors
+
+echo "o 100" > /dev/robot
+while true; do
+	echo "z" > /dev/robot
+	sleep 0.1
+done
