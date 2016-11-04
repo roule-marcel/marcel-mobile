@@ -43,9 +43,12 @@ public:
 	thread th;
 	char c;
 	string path;
-	int fd;
+
+	Channel* publisher;
+
+
 	ProxyIn(char c, const char* path) {
-		fd = -1;
+		publisher = NULL;
 		this->c = c;
 		this->path = path;
 
@@ -54,13 +57,11 @@ public:
 
 	void run() {
 		printf("Proxy '%c' -> '%s'\n", c, path.c_str());
-		fd = publish_out(path.c_str());
-		offer_transport(path.c_str(), "tcp://");
-		if(fd==-1) {fprintf(stderr, "Error : can't open output channel %s\n", path.c_str()); exit(1); }
+		publisher = publish(path);
 	}
 
 	void cmd(const char* command) {
-		if(fd!=-1) pubsub::send(fd, command);
+		if(publisher) publisher->write(command);
 	}
 };
 
@@ -76,7 +77,7 @@ void proxy_in(char c, const char* path) {
 	PROXIES_IN[c] = new ProxyIn(c, path);
 }
 
-void read_conf(const char* file) {
+bool read_conf(const char* file) {
 	FILE* fConf = fopen(file, "r");
 	if(fConf) {
 		char line[1024];
@@ -89,30 +90,32 @@ void read_conf(const char* file) {
 			if(strstr(type, "proxy_in") == type) proxy_in(*c, path);
 			else proxy_out(*c, path);
 		}
+		fclose(fConf);
 	}
-}
-
-void do_proxy(char c, const char* cmd) {
-	ProxyIn* p = PROXIES_IN[c];
-	if(!p) { /* fprintf(stderr, "Unknown command : %c %s\n", c, cmd); */ }
-	else p->cmd(cmd);
+	return fConf != NULL;
 }
 
 int main(int argc, char const *argv[]) {
 	serial_init("/dev/ttyAMA0");
-	read_conf("/etc/marcel/marcel-mobile.conf");
+	FILE* fTTY = fdopen(tty_fd, "r");
+	if(!fTTY) { fprintf(stderr, "Error : /dev/ttyAMA0 doesn't exist - Are you really on a Marcel robot ??? \n"); exit(1); }
+
+	if(!read_conf("./marcel-mobile.conf")) {
+		read_conf("/etc/marcel/marcel-mobile.conf");
+	}
 
 	PROXIES_OUT[0] = new ProxyOut(0, "/dev/robot");
 
 
-	FILE* fTTY = fdopen(tty_fd, "r");
-	if(!fTTY) { fprintf(stderr, "Error : Can't talk to /dev/ttyAMA0\n"); exit(1); }
 	for(;;) {
 		char line[1024];
 		while (fgets(line, 1024, fTTY) != NULL)  {
 			if(line[strlen(line)-1]!='\n') line[strlen(line)-1] = '\n';
 			char c = line[0];
-			do_proxy(c, line[1] == ' ' ? &line[2] : &line[1]);
+			char* cmd = (line[1] == ' ' ? &line[2] : &line[1]);
+			ProxyIn* p = PROXIES_IN[c];
+			if(!p) { fprintf(stderr, "Unknown command : %c %s\n", c, cmd); }
+			else p->cmd(cmd);
 		}
 	}
 
